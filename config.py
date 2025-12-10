@@ -35,7 +35,7 @@ LOG_CHAT = list(
 
 log_chat_id = LOG_CHAT[0]
 
-IMG_URL = os.environ.get("IMG_URL", "https://envs.sh/05W.jpg")
+IMG_URL = os.environ.get("IMG_URL", "https://telegra.ph/file/0ed351c8605c23e8cae79.jpg")
 
 POWERED_BY = os.environ.get("POWERED_BY", "@Dd_Lovely")
 
