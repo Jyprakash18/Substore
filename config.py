@@ -18,8 +18,8 @@ DB_URI = os.environ.get(
 )
 
 DB_NAME = os.environ.get("DATABASE_NAME", "jayhanuman")
-RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "")
-RAZORPAY_SECRET_KEY = os.environ.get("RAZORPAY_SECRET_KEY", "")
+RAZORPAY_KEY_ID = os.environ.get("RAZORPAY_KEY_ID", "rzp_live_Rx0Cra9glkiWDz")
+RAZORPAY_SECRET_KEY = os.environ.get("RAZORPAY_SECRET_KEY", "HCOuIgiYP5kWGG4TPtUl5KUW")
 
 TG_BOT_WORKERS = int(os.environ.get("TG_BOT_WORKERS", "4"))
 
