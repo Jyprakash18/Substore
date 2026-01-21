@@ -39,21 +39,25 @@ async def start(client, message):
     # ... rest of your code ...
     user_data = await present_user(user_id)
     if not user_data:
-        await new_user(user_id)
-        await client.send_message(
-            chat_id=log_chat_id,
-            text=f"New User Started The Bot\n\n{first} | {user_id}",
-            reply_markup=InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton(
-                            "View User",
-                            url=f"tg://user?id={user_id}",
-                        )
-                    ]
-                ]
-            ),
-        )
+        await new_user(user_id) 
+            # ... previous code ...
+    
+    # 👇 Only this code should be here
+    await client.send_photo(
+        chat_id=user_id,
+        caption=caption_txt,
+        photo=IMG_URL,
+        parse_mode=enums.ParseMode.HTML,
+        reply_markup=InlineKeyboardMarkup(
+            [
+                [InlineKeyboardButton("👉 Checkout Plans 👈", callback_data="checkout")],
+                [InlineKeyboardButton("👀 View Demo", url="https://t.me/YourDemoLink"), InlineKeyboardButton("⭐ Reviews", url="https://t.me/YourReviewsLink")],
+                [InlineKeyboardButton("📖 How to Buy", url="https://t.me/YourGuideLink"), InlineKeyboardButton("✉️ Contact Owner", url="https://t.me/YourUsername")],
+                [InlineKeyboardButton("🔥 Sex Talk 🔞", url="https://t.me/YourChannel"), InlineKeyboardButton("🤖 Learn Bot Making", url="https://t.me/YourBotChannel")],
+                [InlineKeyboardButton("📄 My Plan", callback_data="my_plan")]
+            ]
+        ) 
+    # 👆 Make sure there is only ONE closing parenthesis line here     )
 
     if "serid_" in message.text:
         _, service_id = message.text.split("_", 1)
@@ -126,8 +130,7 @@ Your subscription is added and Click Below button to Generate Invite links for t
                     InlineKeyboardButton("📄 My Plan", callback_data="my_plan")
                 ]
             ]
-        )
-    )
+        ) 
 )
 
             )
