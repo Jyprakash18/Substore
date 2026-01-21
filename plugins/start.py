@@ -32,22 +32,28 @@ IST = pytz.timezone("Asia/Kolkata")
 async def start(client, message):
     user_id = message.from_user.id
     first = message.from_user.first_name
-    username = message.from_user.username if message.from_user.username else None
-    @Client.on_callback_query()
+    username = message.from_user.username if message.from_user.username else Non
+# 👇 Ensure these lines touch the left edge (NO SPACES at the start)
+@Client.on_callback_query()
 async def button_handler(client, cb):
+    # 👇 ADD THIS LINE so the bot knows who the user is
+    user_id = cb.from_user.id 
+    
     await cb.answer()
-
     if cb.data == "plan_movies":
         await cb.message.reply_text("🎬 Movies Plan Selected")
-
+    
     elif cb.data == "plan_adult":
         await cb.message.reply_text("💋 Adult Plan Selected")
-
+        
     elif cb.data == "plan_combo":
         await cb.message.reply_text("💎 Combo Plan Selected")
-
+        
+    # Now this line will work because user_id is defined above
     user_data = await present_user(user_id)
-
+    
+    # ... rest of your code ...
+    user_data = await present_user(user_id)
     if not user_data:
         await new_user(user_id)
         await client.send_message(
