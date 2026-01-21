@@ -100,42 +100,16 @@ Hello {first}
 
 Your subscription is added and Click Below button to Generate Invite links for the Groups.
             
-<blockquote>〽️ Powered by {POWERED_BY}</blockquote></b>"""
-
-            await client.send_photo(
+<blockquote>〽️ Powered by {POWERED_BY}</blockquote></b>
    # 👇 Is pure code ko 'start' function ke end mein paste karein
     await client.send_photo(
         chat_id=user_id,
         caption=caption_txt,  # Ya agar aapka variable 'response' hai to 'response' likhein
         photo=IMG_URL,
-        parse_mode=enums.ParseMode.HTML,
-        reply_markup=InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton("👉 Checkout Plans 👈", callback_data="checkout")
-                ],
-                [
-                    InlineKeyboardButton("👀 View Demo", url="https://t.me/YourDemoLink"),
-                    InlineKeyboardButton("⭐ Reviews", url="https://t.me/YourReviewsLink")
-                ],
-                [
-                    InlineKeyboardButton("📖 How to Buy", url="https://t.me/YourGuideLink"),
-                    InlineKeyboardButton("✉️ Contact Owner", url="https://t.me/YourUsername")
-                ],
-                [
-                    InlineKeyboardButton("🔥 Sex Talk 🔞", url="https://t.me/YourChannel"),
-                    InlineKeyboardButton("🤖 Learn Bot Making", url="https://t.me/YourBotChannel")
-                ],
-                [
-                    InlineKeyboardButton("📄 My Plan", callback_data="my_plan")
-                ]
-            ]
-        ) 
-)
-
-            )
+        parse_mode=enums.ParseMode.HTML, 
+    )
     else:
-        response = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>
+        response = f"""<b><Blockquote>MadxBotz ~ Cloud Paid Service</blockquote>
         
 Hello {first}
 
