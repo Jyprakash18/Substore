@@ -33,7 +33,7 @@ async def start(client, message):
     user_id = message.from_user.id
     first = message.from_user.first_name
     username = message.from_user.username if message.from_user.username else None
-    @client.on_callback_query()
+    @Client.on_callback_query()
 async def button_handler(client, cb):
     await cb.answer()
 
