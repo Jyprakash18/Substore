@@ -33,6 +33,19 @@ async def start(client, message):
     user_id = message.from_user.id
     first = message.from_user.first_name
     username = message.from_user.username if message.from_user.username else None
+    @client.on_callback_query()
+async def button_handler(client, cb):
+    await cb.answer()
+
+    if cb.data == "plan_movies":
+        await cb.message.reply_text("🎬 Movies Plan Selected")
+
+    elif cb.data == "plan_adult":
+        await cb.message.reply_text("💋 Adult Plan Selected")
+
+    elif cb.data == "plan_combo":
+        await cb.message.reply_text("💎 Combo Plan Selected")
+
     user_data = await present_user(user_id)
 
     if not user_data:
@@ -96,11 +109,15 @@ Your subscription is added and Click Below button to Generate Invite links for t
 <blockquote>〽️ Powered by {POWERED_BY}</blockquote></b>"""
 
             await client.send_photo(
-                chat_id=user_id,
-                caption=caption_txt,
-                photo=IMG_URL,
-                parse_mode=enums.ParseMode.HTML,
-                reply_markup=reply_markup,
+                keyboard = InlineKeyboardMarkup(
+    [
+        [InlineKeyboardButton("🎬 Movies Only ₹99", callback_data="plan_movies")],
+        [InlineKeyboardButton("💋 Adult Only ₹149", callback_data="plan_adult")],
+        [InlineKeyboardButton("💎 Adult + Movies ₹199", callback_data="plan_combo")],
+        [InlineKeyboardButton("👉 Checkout", callback_data="checkout")],
+    ]
+)
+
             )
     else:
         response = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>
