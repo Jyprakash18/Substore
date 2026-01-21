@@ -99,13 +99,35 @@ Your subscription is added and Click Below button to Generate Invite links for t
 <blockquote>〽️ Powered by {POWERED_BY}</blockquote></b>"""
 
             await client.send_photo(
-                keyboard = InlineKeyboardMarkup(
-    [
-        [InlineKeyboardButton("🎬 Movies Only ₹99", callback_data="plan_movies")],
-        [InlineKeyboardButton("💋 Adult Only ₹149", callback_data="plan_adult")],
-        [InlineKeyboardButton("💎 Adult + Movies ₹199", callback_data="plan_combo")],
-        [InlineKeyboardButton("👉 Checkout", callback_data="checkout")],
-    ]
+   # 👇 Is pure code ko 'start' function ke end mein paste karein
+    await client.send_photo(
+        chat_id=user_id,
+        caption=caption_txt,  # Ya agar aapka variable 'response' hai to 'response' likhein
+        photo=IMG_URL,
+        parse_mode=enums.ParseMode.HTML,
+        reply_markup=InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton("👉 Checkout Plans 👈", callback_data="checkout")
+                ],
+                [
+                    InlineKeyboardButton("👀 View Demo", url="https://t.me/YourDemoLink"),
+                    InlineKeyboardButton("⭐ Reviews", url="https://t.me/YourReviewsLink")
+                ],
+                [
+                    InlineKeyboardButton("📖 How to Buy", url="https://t.me/YourGuideLink"),
+                    InlineKeyboardButton("✉️ Contact Owner", url="https://t.me/YourUsername")
+                ],
+                [
+                    InlineKeyboardButton("🔥 Sex Talk 🔞", url="https://t.me/YourChannel"),
+                    InlineKeyboardButton("🤖 Learn Bot Making", url="https://t.me/YourBotChannel")
+                ],
+                [
+                    InlineKeyboardButton("📄 My Plan", callback_data="my_plan")
+                ]
+            ]
+        )
+    )
 )
 
             )
