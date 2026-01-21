@@ -673,4 +673,61 @@ async def send_text(client: Bot, message: Message):
             "<i>No message to broadcast. Please reply to a message.</i>"
         )
         await asyncio.sleep(8)
-        await msg.delete()
+        await msg.delete()   
+# 👇 PASTE THIS AT THE VERY BOTTOM OF THE FILE 👇
+
+@Client.on_callback_query()
+async def button_handler(client, cb):
+    # 1. Get User ID
+    user_id = cb.from_user.id
+    
+    # 2. Logic for "Checkout Plans" (Page 2)
+    if cb.data == "checkout":
+        await cb.message.edit_text(
+            text="<b>Select a Plan Below:</b>",
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [InlineKeyboardButton("-- 1 MONTH PLANS --", callback_data="ignore")],
+                    [InlineKeyboardButton("🎬 Movies Only (1 Month) ₹99", callback_data="plan_movies")],
+                    [InlineKeyboardButton("💋 Adult Only (1 Month) ₹149", callback_data="plan_adult")],
+                    [InlineKeyboardButton("💎 Adult + Movies (1 Month) ₹199", callback_data="plan_combo")],
+                    [InlineKeyboardButton("-- OR --", callback_data="ignore")],
+                    [InlineKeyboardButton("🆓 GET FREE MEMBERSHIP", callback_data="free_sub")],
+                    [InlineKeyboardButton("🔙 Back to Main Menu", callback_data="back_home")]
+                ]
+            )
+        )
+    
+    # 3. Logic for "Back to Main Menu" (Page 1)
+    elif cb.data == "back_home":
+        await cb.message.delete() # Delete the text menu
+        # Send the Photo Menu again
+        await client.send_photo(
+            chat_id=user_id,
+            photo=IMG_URL,
+            caption=f"Hello {cb.from_user.first_name}, Welcome back!",
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [InlineKeyboardButton("👉 Checkout Plans 👈", callback_data="checkout")],
+                    [InlineKeyboardButton("👀 View Demo", url="https://t.me/YourDemo"), InlineKeyboardButton("⭐ Reviews", url="https://t.me/YourReviews")],
+                    [InlineKeyboardButton("📖 How to Buy", url="https://t.me/Buy"), InlineKeyboardButton("✉️ Contact Owner", url="https://t.me/Owner")],
+                    [InlineKeyboardButton("🔥 Sex Talk 🔞", url="https://t.me/Adult"), InlineKeyboardButton("🤖 Learn Bot Making", url="https://t.me/Bot")],
+                    [InlineKeyboardButton("📄 My Plan", callback_data="my_plan")]
+                ]
+            )
+        )
+
+    # 4. Logic for Selecting a Plan
+    elif cb.data in ["plan_movies", "plan_adult", "plan_combo"]:
+        plan_name = cb.data.replace("plan_", "").capitalize()
+        await cb.message.reply_text(f"✅ You selected the **{plan_name}** Plan.\nPlease pay using the details above or contact admin.")
+        await cb.answer()
+
+    # 5. Logic for 'My Plan'
+    elif cb.data == "my_plan":
+        await cb.answer("Fetching your plan details...", show_alert=False)
+        # You can add logic here to show their specific plan info
+        
+    # 6. Ignore dummy buttons
+    elif cb.data == "ignore":
+        await cb.answer()
