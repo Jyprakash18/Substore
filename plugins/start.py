@@ -81,54 +81,76 @@ Send /buyservice to buy a new subscription.
                 caption=response,
                 photo=IMG_URL,
                 parse_mode=enums.ParseMode.HTML,
-            )
-        else:
+            )else:
+            # (User IS subscribed)
             reply_markup = InlineKeyboardMarkup(
                 [
                     [
                         InlineKeyboardButton(
                             "Generate Link",
-                            callback_data=f"generate_{service_id}",
+                            callback_data=f"generate_{service_id}"
                         )
                     ]
                 ]
             )
 
             caption_txt = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>
-            
+
 Hello {first}
 
-Your subscription is added and Click Below button to Generate Invite links for the Groups.
-            
-<blockquote>〽️ Powered by {POWERED_BY}</blockquote></b>
-   # 👇 Is pure code ko 'start' function ke end mein paste karein
-    await client.send_photo(
-        chat_id=user_id,
-        caption=caption_txt,  # Ya agar aapka variable 'response' hai to 'response' likhein
-        photo=IMG_URL,
-        parse_mode=enums.ParseMode.HTML, 
-    )
+Your subscription is added! Click the button below to Generate Invite links for the Groups.
+
+<blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
+
+            await client.send_photo(
+                chat_id=user_id,
+                caption=caption_txt,
+                photo=IMG_URL,
+                parse_mode=enums.ParseMode.HTML,
+                reply_markup=reply_markup
+            )
+
     else:
-        response = f"""<b><Blockquote>MadxBotz ~ Cloud Paid Service</blockquote>
-        
+        # (Normal /start command - No Link)
+        response = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>
+
 Hello {first}
 
 I am the Subscription Management Bot for MadxBotz Community.
 
 Send /buyservice to subscribe for New Service.
 
-If you need assistance with your subscription, please 
+If you need assistance with your subscription, please
 contact the admin or check your subscription details using
 the /mysub command.
 
 Thank you for choosing our community.
 
-<blockquote>〽️ Powered by {POWERED_BY}</blockquote></b>"""
+<blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
+
         await client.send_photo(
             chat_id=user_id,
             caption=response,
             photo=IMG_URL,
             parse_mode=enums.ParseMode.HTML,
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [InlineKeyboardButton("👉 Checkout Plans 👈", callback_data="checkout")],
+                    [
+                        InlineKeyboardButton("👀 View Demo", url="https://t.me/YourDemoLink"),
+                        InlineKeyboardButton("⭐ Reviews", url="https://t.me/YourReviewsLink")
+                    ],
+                    [
+                        InlineKeyboardButton("📖 How to Buy", url="https://t.me/YourGuideLink"),
+                        InlineKeyboardButton("✉️ Contact Owner", url="https://t.me/YourUsername")
+                    ],
+                    [
+                        InlineKeyboardButton("🔥 Sex Talk 🔞", url="https://t.me/YourChannel"),
+                        InlineKeyboardButton("🤖 Learn Bot Making", url="https://t.me/YourBotChannel")
+                    ],
+                    [InlineKeyboardButton("📄 My Plan", callback_data="my_plan")]
+                ]
+            )
         )
 
 
