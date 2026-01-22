@@ -71,52 +71,39 @@ async def start(client, message):
 <b><blockquote>Hello {first}</blockquote>
 
 You don't have any active subscriptions to generate an invite link.
+# 👇 This code goes right under 'is_subscribed...' check
+    if not is_subscribed:
+        response = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>
+
+Hello {first}
+
+You don't have any active subscriptions to generate an invite link.
 
 Send /buyservice to buy a new subscription.
 
-<blockquote>〽️ Powered by {POWERED_BY}</blockquote>
-</b>"""
-            await client.send_photo(
-                chat_id=user_id,
-                caption=response,
-                photo=IMG_URL,
-                parse_mode=enums.ParseMode.HTML,
-            )else:
-            # (User IS subscribed)
-            reply_markup = InlineKeyboardMarkup(
+<blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
+
+        await client.send_photo(
+            chat_id=user_id,
+            caption=response,
+            photo=IMG_URL,
+            parse_mode=enums.ParseMode.HTML,
+        ) 
+    
+    else:
+        # User IS subscribed
+        reply_markup = InlineKeyboardMarkup(
+            [
                 [
-                    [
-                        InlineKeyboardButton(
-                            "Generate Link",
-                            callback_data=f"generate_{service_id}"
-                        )
-                    ]
+                    InlineKeyboardButton(
+                        "Generate Link",
+                        callback_data=f"generate_{service_id}",
+                    )
                 ]
-            )
-
-            caption_txt = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>
-
-Hello {first}
-
-Your subscription is added! Click the button below to Generate Invite links for the Groups.
-
-<blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
-
-            await client.send_photo(
-                chat_id=user_id,
-                caption=caption_txt,
-                photo=IMG_URL,
-                parse_mode=enums.ParseMode.HTML,
-                reply_markup=reply_markup
-            )
-
-    else:
-            # (User IS subscribed logic)
-            reply_markup = InlineKeyboardMarkup(
-                [[InlineKeyboardButton("Generate Link", callback_data=f"generate_{service_id}")]]
-            )
-
-            caption_txt = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>
+            ]
+        )
+        
+        caption_txt = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>
 
 Hello {first}
 
@@ -124,16 +111,16 @@ Your subscription is added! Click the button below to Generate Invite links for 
 
 <blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
 
-            await client.send_photo(
-                chat_id=user_id,
-                caption=caption_txt,
-                photo=IMG_URL,
-                parse_mode=enums.ParseMode.HTML,
-                reply_markup=reply_markup
-            ) # <--- THIS CLOSES THE PHOTO BLOCK
+        await client.send_photo(
+            chat_id=user_id,
+            caption=caption_txt,
+            photo=IMG_URL,
+            parse_mode=enums.ParseMode.HTML,
+            reply_markup=reply_markup
+        ) 
 
-    else:
-        # (Normal /start command logic)
+    # 👇 This handles the normal /start (Main Menu)
+    if "serid_" not in message.text:
         response = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>
 
 Hello {first}
@@ -158,7 +145,7 @@ Send /buyservice to subscribe for New Service.
                     [InlineKeyboardButton("📄 My Plan", callback_data="my_plan")]
                 ]
             )
-        ) # <--- THIS CLOSES THE PHOTO BLOCK
+        )
 
 
 @Bot.on_message(filters.private & filters.command("plans"))
