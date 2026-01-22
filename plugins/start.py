@@ -111,7 +111,29 @@ Your subscription is added! Click the button below to Generate Invite links for 
             )
 
     else:
-        # (Normal /start command - No Link)
+            # (User IS subscribed logic)
+            reply_markup = InlineKeyboardMarkup(
+                [[InlineKeyboardButton("Generate Link", callback_data=f"generate_{service_id}")]]
+            )
+
+            caption_txt = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>
+
+Hello {first}
+
+Your subscription is added! Click the button below to Generate Invite links for the Groups.
+
+<blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
+
+            await client.send_photo(
+                chat_id=user_id,
+                caption=caption_txt,
+                photo=IMG_URL,
+                parse_mode=enums.ParseMode.HTML,
+                reply_markup=reply_markup
+            ) # <--- THIS CLOSES THE PHOTO BLOCK
+
+    else:
+        # (Normal /start command logic)
         response = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>
 
 Hello {first}
@@ -119,12 +141,6 @@ Hello {first}
 I am the Subscription Management Bot for MadxBotz Community.
 
 Send /buyservice to subscribe for New Service.
-
-If you need assistance with your subscription, please
-contact the admin or check your subscription details using
-the /mysub command.
-
-Thank you for choosing our community.
 
 <blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
 
@@ -136,22 +152,13 @@ Thank you for choosing our community.
             reply_markup=InlineKeyboardMarkup(
                 [
                     [InlineKeyboardButton("👉 Checkout Plans 👈", callback_data="checkout")],
-                    [
-                        InlineKeyboardButton("👀 View Demo", url="https://t.me/YourDemoLink"),
-                        InlineKeyboardButton("⭐ Reviews", url="https://t.me/YourReviewsLink")
-                    ],
-                    [
-                        InlineKeyboardButton("📖 How to Buy", url="https://t.me/YourGuideLink"),
-                        InlineKeyboardButton("✉️ Contact Owner", url="https://t.me/YourUsername")
-                    ],
-                    [
-                        InlineKeyboardButton("🔥 Sex Talk 🔞", url="https://t.me/YourChannel"),
-                        InlineKeyboardButton("🤖 Learn Bot Making", url="https://t.me/YourBotChannel")
-                    ],
+                    [InlineKeyboardButton("👀 View Demo", url="https://t.me/YourDemoLink"), InlineKeyboardButton("⭐ Reviews", url="https://t.me/YourReviewsLink")],
+                    [InlineKeyboardButton("📖 How to Buy", url="https://t.me/YourGuideLink"), InlineKeyboardButton("✉️ Contact Owner", url="https://t.me/YourUsername")],
+                    [InlineKeyboardButton("🔥 Sex Talk 🔞", url="https://t.me/YourChannel"), InlineKeyboardButton("🤖 Learn Bot Making", url="https://t.me/YourBotChannel")],
                     [InlineKeyboardButton("📄 My Plan", callback_data="my_plan")]
                 ]
             )
-        )
+        ) # <--- THIS CLOSES THE PHOTO BLOCK
 
 
 @Bot.on_message(filters.private & filters.command("plans"))
