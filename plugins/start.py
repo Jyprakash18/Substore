@@ -56,7 +56,8 @@ async def start(client, message):
                 [InlineKeyboardButton("🔥 Sex Talk 🔞", url="https://t.me/YourChannel"), InlineKeyboardButton("🤖 Learn Bot Making", url="https://t.me/YourBotChannel")],
                 [InlineKeyboardButton("📄 My Plan", callback_data="my_plan")]
             ]
-        ) 
+       ) 
+   ) 
     # 👆 Make sure there is only ONE closing parenthesis line here     )
 
 if "serid_" in message.text:
