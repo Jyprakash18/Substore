@@ -1,5 +1,6 @@
 import asyncio
 import time
+from plugins import start
 from datetime import datetime
 from pyrogram import Client, filters, __version__, enums
 from pyrogram.enums import ParseMode
