@@ -26,25 +26,20 @@ from math import ceil
 
 
 IST = pytz.timezone("Asia/Kolkata")
-            service_name = "N/A"    
+            service_name = "N/A"
 @Client.on_message(filters.command("start") & filters.incoming)
 async def start(client, message):
     user_id = message.from_user.id
     first = message.from_user.first_name
     
-    # 1. Check agar link me "serid_" hai (Subscription Link)
+    # 1. Check if the link has a "serid_"
     if "serid_" in message.text:
         try:
             _, service_id = message.text.split("_", 1)
-            
-            # Subscription check karein
             is_subscribed, expiration_date = await verify_subscription(client, user_id, service_id)
 
             if not is_subscribed:
-                # Case A: User ke paas Plan nahi hai
-                # 👇 Ye dekho, maine """ lagaya hai taaki 〽 error na de
-                txt = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>\n\nHello {first}\n\nYou don't have any active subscriptions to generate an invite link.\n\nSend /buyservice to buy a new subscription.\n\n<blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
-                
+                txt = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>\n\nHello {first}\n\nYou don't have any active subscriptions.\n\n<blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
                 await client.send_photo(
                     chat_id=user_id,
                     caption=txt,
@@ -52,10 +47,8 @@ async def start(client, message):
                     parse_mode=enums.ParseMode.HTML
                 )
             else:
-                # Case B: User ke paas Plan hai
                 btn = InlineKeyboardMarkup([[InlineKeyboardButton("Generate Link", callback_data=f"generate_{service_id}")]])
-                txt = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>\n\nHello {first}\n\nYour subscription is added! Click the button below to Generate Invite links.\n\n<blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
-                
+                txt = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>\n\nHello {first}\n\nYour subscription is added! Click below.\n\n<blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
                 await client.send_photo(
                     chat_id=user_id,
                     caption=txt,
@@ -69,15 +62,12 @@ async def start(client, message):
 
     # 2. Normal /start command (Main Menu)
     else:
-        # Yahan bhi """ use kiya hai
-        txt = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>\n\nHello {first}\n\nI am the Subscription Management Bot for MadxBotz Community.\n\nSend /buyservice to subscribe for New Service.\n\n<blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
-        
-        # Main Menu Buttons
+        txt = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>\n\nHello {first}\n\nI am the Subscription Management Bot.\n\n<blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
         buttons = InlineKeyboardMarkup([
             [InlineKeyboardButton("👉 Checkout Plans 👈", callback_data="checkout")],
-            [InlineKeyboardButton("👀 View Demo", url="https://t.me/YourDemo"), InlineKeyboardButton("⭐ Reviews", url="https://t.me/YourReviews")],
-            [InlineKeyboardButton("📖 How to Buy", url="https://t.me/HowToBuy"), InlineKeyboardButton("✉️ Contact Owner", url="https://t.me/Owner")],
-            [InlineKeyboardButton("🔥 Sex Talk 🔞", url="https://t.me/Adult"), InlineKeyboardButton("🤖 Learn Bot Making", url="https://t.me/BotMaking")],
+            [InlineKeyboardButton("👀 View Demo", url="https://t.me/YourDemoLink"), InlineKeyboardButton("⭐ Reviews", url="https://t.me/YourReviewsLink")],
+            [InlineKeyboardButton("📖 How to Buy", url="https://t.me/YourGuideLink"), InlineKeyboardButton("✉️ Contact Owner", url="https://t.me/YourUsername")],
+            [InlineKeyboardButton("🔥 Sex Talk 🔞", url="https://t.me/YourChannel"), InlineKeyboardButton("🤖 Learn Bot Making", url="https://t.me/YourBotChannel")],
             [InlineKeyboardButton("📄 My Plan", callback_data="my_plan")]
         ])
 
