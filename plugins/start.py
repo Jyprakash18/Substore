@@ -118,12 +118,22 @@ the /mysub command.
 Thank you for choosing our community.
 
 <blockquote>〽️ Powered by {POWERED_BY}</blockquote></b>"""
-        await client.send_photo(
-            chat_id=user_id,
-            caption=response,
-            photo=IMG_URL,
-            parse_mode=enums.ParseMode.HTML,
-        )
+        # pseudo-structure around your existing code
+async def start_command(update, context):
+    # existing text
+    await update.message.reply_text("Welcome to Substore!")
+
+    # add inline keyboard here
+    keyboard = [
+        [InlineKeyboardButton("Subscribe", callback_data="subscribe")],
+        [InlineKeyboardButton("Help", callback_data="help")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await update.message.reply_text(
+        "Choose an action:", reply_markup=reply_markup
+    )
+
 
 
 @Bot.on_message(filters.private & filters.command("plans"))
