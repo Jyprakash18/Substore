@@ -119,27 +119,17 @@ the /mysub command.
 Thank you for choosing our community.
 
 <blockquote>〽️ Powered by {POWERED_BY}</blockquote></b>"""
+from pyrogram import filters
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
 @Bot.on_message(filters.private & filters.command("start"))
 async def start_command(client, message):
-
-    text = f"""
-Hello {message.from_user.first_name}
-
-I am the Subscription Management Bot for MadxBotz Community.
-
-Send /buyservice to subscribe for New Service.
-
-If you need assistance with your subscription,
-contact admin or use /mysub command.
-
-Thank you for choosing our community.
-"""
 
     keyboard = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("🛒 Buy Service", callback_data="buy_service"),
-                InlineKeyboardButton("📦 My Subscription", callback_data="my_sub")
+                InlineKeyboardButton("🛒 Buy Service", callback_data="buy"),
+                InlineKeyboardButton("📦 My Sub", callback_data="mysub")
             ],
             [
                 InlineKeyboardButton("🆘 Help", callback_data="help")
@@ -148,7 +138,7 @@ Thank you for choosing our community.
     )
 
     await message.reply_text(
-        text,
+        "👋 Welcome to Substore\nChoose an option below 👇",
         reply_markup=keyboard
     )
 
