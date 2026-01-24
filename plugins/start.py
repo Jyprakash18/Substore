@@ -27,97 +27,63 @@ from math import ceil
 
 IST = pytz.timezone("Asia/Kolkata")
 
-
 @Client.on_message(filters.command("start") & filters.incoming)
 async def start(client, message):
     user_id = message.from_user.id
     first = message.from_user.first_name
-    username = message.from_user.username if message.from_user.username else Non
-    # Now this line will work because user_id is defined above
-    user_data = await present_user(user_id)
     
-    # ... rest of your code ...
-    user_data = await present_user(user_id)
-    if not user_data:
-        await new_user(user_id) 
-            # ... previous code ...
-    
-    # 👇 Only this code should be here
-    await client.send_photo(
-        chat_id=user_id,
-        caption=caption_txt,
-        photo=IMG_URL,
-        parse_mode=enums.ParseMode.HTML,
-        reply_markup=InlineKeyboardMarkup(
-            [
-                [InlineKeyboardButton("👉 Checkout Plans 👈", callback_data="checkout")],
-                [InlineKeyboardButton("👀 View Demo", url="https://t.me/YourDemoLink"), InlineKeyboardButton("⭐ Reviews", url="https://t.me/YourReviewsLink")],
-                [InlineKeyboardButton("📖 How to Buy", url="https://t.me/YourGuideLink"), InlineKeyboardButton("✉️ Contact Owner", url="https://t.me/YourUsername")],
-                [InlineKeyboardButton("🔥 Sex Talk 🔞", url="https://t.me/YourChannel"), InlineKeyboardButton("🤖 Learn Bot Making", url="https://t.me/YourBotChannel")],
-                [InlineKeyboardButton("📄 My Plan", callback_data="my_plan")]
-            ]
-       ) 
-   ) 
-    # 👆 Make sure there is only ONE closing parenthesis line here     )
-
-if "serid_" in message.text:
-        _, service_id = message.text.split("_", 1)
-
-        is_subscribed, expiration_date = await verify_subscription(
-            client, user_id, service_id
-        )
-
-        if not is_subscribed:
-            response = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>
-
-Hello {first}
-
-You don't have any active subscriptions to generate an invite link.
-
-Send /buyservice to buy a new subscription.
-
-<blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
-
-            await client.send_photo(
-                chat_id=user_id,
-                caption=response,
-                photo=IMG_URL,
-                parse_mode=enums.ParseMode.HTML,
-            )
-        
-        else:
-            # User IS subscribed
-            reply_markup = InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton(
-                            "Generate Link",
-                            callback_data=f"generate_{service_id}",
-                        )
-                    ]
-                ]
-            )
+    # 1. Check if the link has a "serid_" (Subscription Link)
+    if "serid_" in message.text:
+        try:
+            _, service_id = message.text.split("_", 1)
             
-            caption_txt = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>
+            # Verify subscription logic
+            is_subscribed, expiration_date = await verify_subscription(client, user_id, service_id)
 
-Hello {first}
+            if not is_subscribed:
+                # Case A: User clicked link but has NO Plan
+                txt = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>\n\nHello {first}\n\nYou don't have any active subscriptions to generate an invite link.\n\nSend /buyservice to buy a new subscription.\n\n<blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
+                await client.send_photo(
+                    chat_id=user_id,
+                    caption=txt,
+                    photo=IMG_URL,
+                    parse_mode=enums.ParseMode.HTML
+                )
+            else:
+                # Case B: User clicked link and HAS a Plan
+                btn = InlineKeyboardMarkup([[InlineKeyboardButton("Generate Link", callback_data=f"generate_{service_id}")]])
+                txt = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>\n\nHello {first}\n\nYour subscription is added! Click the button below to Generate Invite links.\n\n<blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
+                await client.send_photo(
+                    chat_id=user_id,
+                    caption=txt,
+                    photo=IMG_URL,
+                    parse_mode=enums.ParseMode.HTML,
+                    reply_markup=btn
+                )
+        except Exception as e:
+            print(f"Error in start link: {e}")
+            return
 
-Your subscription is added! Click the button below to Generate Invite links for the Groups.
-
-<blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
-
-            await client.send_photo(
-                chat_id=user_id,
-                caption=caption_txt,
-                photo=IMG_URL,
-                parse_mode=enums.ParseMode.HTML,
-                reply_markup=reply_markup
-            )
-
+    # 2. Normal /start command (Main Menu)
     else:
-        # Main Menu (Normal /start)
-        response = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>
+        txt = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>\n\nHello {first}\n\nI am the Subscription Management Bot for MadxBotz Community.\n\nSend /buyservice to subscribe for New Service.\n\n<blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
+        
+        # Main Menu Buttons
+        buttons = InlineKeyboardMarkup([
+            [InlineKeyboardButton("👉 Checkout Plans 👈", callback_data="checkout")],
+            [InlineKeyboardButton("👀 View Demo", url="https://t.me/YourDemo"), InlineKeyboardButton("⭐ Reviews", url="https://t.me/YourReviews")],
+            [InlineKeyboardButton("📖 How to Buy", url="https://t.me/HowToBuy"), InlineKeyboardButton("✉️ Contact Owner", url="https://t.me/Owner")],
+            [InlineKeyboardButton("🔥 Sex Talk 🔞", url="https://t.me/Adult"), InlineKeyboardButton("🤖 Learn Bot Making", url="https://t.me/BotMaking")],
+            [InlineKeyboardButton("📄 My Plan", callback_data="my_plan")]
+        ])
 
+        await client.send_photo(
+            chat_id=user_id,
+            caption=txt,
+            photo=IMG_URL,
+            parse_mode=enums.ParseMode.HTML,
+            reply_markup=buttons
+        )
 Hello {first}
 
 I am the Subscription Management Bot for MadxBotz Community.
