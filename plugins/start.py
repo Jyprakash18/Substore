@@ -60,15 +60,53 @@ async def start(client, message):
                     parse_mode=enums.ParseMode.HTML,
                     reply_markup=btn
                 )
+        # 👇 Paste this starting at Line 63
+
+
+
+    
+    if "serid_" in message.text:
+        try:
+            _, service_id = message.text.split("_", 1)
+
+            # Verify subscription logic
+            is_subscribed, expiration_date = await verify_subscription(
+                client, user_id, service_id
+            )
+
+            if not is_subscribed:
+                # Case A: User clicked link but has NO Plan
+                txt = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>\n\nHello {first}\n\nYou don't have any active subscriptions to generate an invite link.\n\nSend /buyservice to buy a new subscription.\n\n<blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
+                
+                await client.send_photo(
+                    chat_id=user_id,
+                    caption=txt,
+                    photo=IMG_URL,
+                    parse_mode=enums.ParseMode.HTML
+                )
+            
+            else:
+                # Case B: User clicked link and HAS a Plan
+                btn = InlineKeyboardMarkup([[InlineKeyboardButton("Generate Link", callback_data=f"generate_{service_id}")]])
+                txt = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>\n\nHello {first}\n\nYour subscription is added! Click the button below to Generate Invite links.\n\n<blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
+                
+                await client.send_photo(
+                    chat_id=user_id,
+                    caption=txt,
+                    photo=IMG_URL,
+                    parse_mode=enums.ParseMode.HTML,
+                    reply_markup=btn
+                )
         except Exception as e:
             print(f"Error in start link: {e}")
             return
 
     # 2. Normal /start command (Main Menu)
     else:
+        # Define the Main Menu Text
         txt = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>\n\nHello {first}\n\nI am the Subscription Management Bot for MadxBotz Community.\n\nSend /buyservice to subscribe for New Service.\n\n<blockquote>〽 Powered by {POWERED_BY}</blockquote></b>"""
-        
-        # Main Menu Buttons
+
+        # Define the Main Menu Buttons
         buttons = InlineKeyboardMarkup([
             [InlineKeyboardButton("👉 Checkout Plans 👈", callback_data="checkout")],
             [InlineKeyboardButton("👀 View Demo", url="https://t.me/YourDemo"), InlineKeyboardButton("⭐ Reviews", url="https://t.me/YourReviews")],
