@@ -118,27 +118,39 @@ the /mysub command.
 Thank you for choosing our community.
 
 <blockquote>〽️ Powered by {POWERED_BY}</blockquote></b>"""
-        # pseudo-structure around your existing code
-async def start_command(update, context):
-    # existing text
-    await update.message.reply_text("Welcome to Substore!")
+@Bot.on_message(filters.private & filters.command("start"))
+async def start_command(client, message):
 
-    # add inline keyboard here
-    keyboard = [
-        [InlineKeyboardButton("Subscribe", callback_data="subscribe")],
-        [InlineKeyboardButton("Help", callback_data="help")]
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    text = f"""
+Hello {message.from_user.first_name}
 
-    await update.message.reply_text(
-        "Choose an action:", reply_markup=reply_markup
+I am the Subscription Management Bot for MadxBotz Community.
+
+Send /buyservice to subscribe for New Service.
+
+If you need assistance with your subscription,
+contact admin or use /mysub command.
+
+Thank you for choosing our community.
+"""
+
+    keyboard = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton("🛒 Buy Service", callback_data="buy_service"),
+                InlineKeyboardButton("📦 My Subscription", callback_data="my_sub")
+            ],
+            [
+                InlineKeyboardButton("🆘 Help", callback_data="help")
+            ]
+        ]
     )
 
+    await message.reply_text(
+        text,
+        reply_markup=keyboard
+    )
 
-
-@Bot.on_message(filters.private & filters.command("plans"))
-async def plan_handler(client: Client, message: Message):
-    user_id = message.from_user.id
 
     response = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>
     
