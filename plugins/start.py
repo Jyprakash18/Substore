@@ -141,6 +141,17 @@ async def start_command(client, message):
         "👋 Welcome to Substore\nChoose an option below 👇",
         reply_markup=keyboard
     )
+@Bot.on_callback_query()
+async def callback_handler(client, callback_query):
+    data = callback_query.data
+    await callback_query.answer()
+
+    if data == "buy":
+        await callback_query.message.reply_text("Send /buyservice to buy 🛒")
+    elif data == "mysub":
+        await callback_query.message.reply_text("Send /mysub to check 📦")
+    elif data == "help":
+        await callback_query.message.reply_text("Contact admin 🆘")
 
 
     response = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>
