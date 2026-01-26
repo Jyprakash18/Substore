@@ -1,20 +1,9 @@
-import asyncio
-import time
+from pyrogram import Client, filters, enums
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from datetime import datetime
 from math import ceil
-from typing import List
-
-import pytz
 from bson import ObjectId
-from bson.decimal128 import Decimal128
-
-from pyrogram import filters, enums
-from pyrogram.types import (
-    Message,
-    InlineKeyboardMarkup,
-    InlineKeyboardButton,
-)
-from pyrogram.errors import FloodWait, UserIsBlocked, InputUserDeactivated
+import pytz
 
 from bot import Bot
 from config import *
@@ -32,182 +21,134 @@ from database.database import (
 
 IST = pytz.timezone("Asia/Kolkata")
 
-# =========================================================
-# START COMMAND
-# =========================================================
+SUBSCRIPTIONS_PER_PAGE = 1
+PAGE_SIZE = 2
 
-@Bot.on_message(filters.private & filters.command("start"))
-async def start_command(client: Bot, message: Message):
+user_pagination_data = {}
 
+# ============================== START ==============================
+
+@Client.on_message(filters.command("start") & filters.private)
+async def start(client, message):
     user_id = message.from_user.id
     first = message.from_user.first_name
 
-    # save new user
     if not await present_user(user_id):
         await new_user(user_id)
-        await client.send_message(
-            chat_id=log_chat_id,
-            text=f"👤 New User Started Bot\n\n{first} | {user_id}",
-            reply_markup=InlineKeyboardMarkup(
-                [[InlineKeyboardButton("View User", url=f"tg://user?id={user_id}")]]
-            ),
-        )
 
-    keyboard = InlineKeyboardMarkup(
+    buttons = InlineKeyboardMarkup(
         [
-            [
-                InlineKeyboardButton("🛒 Buy Service", callback_data="buy"),
-                InlineKeyboardButton("📦 My Subscription", callback_data="mysub"),
-            ],
-            [
-                InlineKeyboardButton("🆘 Help", callback_data="help"),
-            ],
+            [InlineKeyboardButton("🛒 Buy Service", callback_data="buy_service")],
+            [InlineKeyboardButton("📦 My Subscription", callback_data="my_sub")]
         ]
     )
 
-    text = f"""<b><blockquote>MadxBotz ~ Cloud Paid Service</blockquote>
-
-Hello {first} 👋
-
-I am the Subscription Management Bot.
-
-Use buttons below 👇
-
-<blockquote>〽️ Powered by {POWERED_BY}</blockquote></b>"""
-
-    await message.reply_photo(
+    await client.send_photo(
+        chat_id=user_id,
         photo=IMG_URL,
-        caption=text,
-        reply_markup=keyboard,
-        parse_mode=enums.ParseMode.HTML,
+        caption=f"<b>Hello {first}\nWelcome to MadxBotz</b>",
+        reply_markup=buttons,
+        parse_mode=enums.ParseMode.HTML
     )
 
-# =========================================================
-# CALLBACK HANDLER
-# =========================================================
+# ============================== CALLBACKS ==============================
 
-@Bot.on_callback_query()
-async def callback_handler(client: Bot, callback_query):
-
-    user_id = callback_query.from_user.id
-    data = callback_query.data
-    await callback_query.answer()
-
-    if data == "buy":
-        await client.send_message(user_id, "🛒 Send /buyservice to purchase a plan")
-
-    elif data == "mysub":
-        await client.send_message(user_id, "📦 Send /mysub to check your subscription")
-
-    elif data == "help":
-        await client.send_message(user_id, "🆘 Contact admin for help")
-
-# =========================================================
-# ADD SUB (ADMIN)
-# =========================================================
-
-@Bot.on_message(filters.private & filters.user(ADMINS) & filters.command("addsub"))
-async def addsub_handler(client: Bot, message: Message):
-
-    parts = message.text.split()
-    if len(parts) != 2:
-        return await message.reply_text("Usage: /addsub user_id")
-
-    user_id = int(parts[1])
-    services = [s async for s in services_data.find()]
-
-    if not services:
-        return await message.reply_text("No services available.")
-
-    buttons = [
-        [
-            InlineKeyboardButton(
-                s["service_name"],
-                callback_data=f"manadd_{s['_id']}_{user_id}",
-            )
-        ]
-        for s in services
-    ]
-
-    await message.reply_text(
-        "Select a service:",
-        reply_markup=InlineKeyboardMarkup(buttons),
-    )
-
-# =========================================================
-# REMOVE SUB (ADMIN)
-# =========================================================
-
-@Bot.on_message(filters.private & filters.user(ADMINS) & filters.command("remsub"))
-async def remsub_command(client: Bot, message: Message):
-
-    parts = message.text.split()
-    if len(parts) != 3:
-        return await message.reply("Usage: /remsub user_id service_id")
-
-    user_id = int(parts[1])
-    service_id = parts[2]
-
-    await rem_subscription_user(user_id, service_id)
-
-    await client.send_message(
-        user_id,
-        "❌ Your subscription has been cancelled. Contact support.",
-    )
-
-    await client.send_message(
-        log_chat_id,
-        f"Subscription removed\nUser: {user_id}",
-    )
-
-    await message.reply("Subscription removed successfully ✅")
-
-# =========================================================
-# MY SUBSCRIPTION
-# =========================================================
-
-SUBSCRIPTIONS_PER_PAGE = 1
-
-@Bot.on_message(filters.private & filters.command("mysub"))
-async def my_sub_command(client: Bot, message: Message):
-
-    user_id = message.from_user.id
+@Client.on_callback_query(filters.regex("^my_sub$"))
+async def mysub_cb(client, query):
+    user_id = query.from_user.id
     subs = await subscriptions_data.find({"user_id": user_id}).to_list(None)
 
     if not subs:
-        return await message.reply_photo(
-            photo=IMG_URL,
-            caption="<b>No active subscription found.</b>",
-            parse_mode=enums.ParseMode.HTML,
-        )
+        await query.answer("No active subscription", show_alert=True)
+        return
 
-    await send_subscription_page(client, message, subs, 1)
+    await send_subscription_page(client, query.message, subs, 1)
+
+@Client.on_callback_query(filters.regex("^sub_page_"))
+async def sub_page_cb(client, query):
+    page = int(query.data.split("_")[-1])
+    user_id = query.from_user.id
+
+    subs = await subscriptions_data.find({"user_id": user_id}).to_list(None)
+    await send_subscription_page(client, query.message, subs, page)
+    await query.answer()
+
+@Client.on_callback_query(filters.regex("^page_"))
+async def admin_page_cb(client, query):
+    page = int(query.data.split("_")[-1])
+    users = user_pagination_data.get(query.from_user.id)
+
+    if not users:
+        await query.answer("Session expired", show_alert=True)
+        return
+
+    user_list = await get_user_list_page(client, page, users)
+
+    buttons = []
+    if page > 0:
+        buttons.append(InlineKeyboardButton("⬅️ Prev", callback_data=f"page_{page-1}"))
+    if (page + 1) * PAGE_SIZE < len(users):
+        buttons.append(InlineKeyboardButton("Next ➡️", callback_data=f"page_{page+1}"))
+
+    await query.message.edit_caption(
+        caption=f"<b><blockquote>User Details</blockquote></b>{''.join(user_list)}",
+        reply_markup=InlineKeyboardMarkup([buttons]) if buttons else None,
+        parse_mode=enums.ParseMode.HTML
+    )
+    await query.answer()
+
+# ============================== SUB DISPLAY ==============================
 
 async def send_subscription_page(client, message, subs, page):
+    total_pages = ceil(len(subs) / SUBSCRIPTIONS_PER_PAGE)
+    sub = subs[page-1]
 
-    sub = subs[page - 1]
-    expiry = sub.get("expiry")
+    service_data = await services_data.find_one({"_id": ObjectId(sub["service_id"])})
+    service_name = service_data["service_name"]
 
-    if expiry:
-        expiry_date = datetime.fromtimestamp(expiry, IST).strftime("%d-%b-%Y %I:%M %p")
-        remaining = await get_remaining_time(expiry)
-    else:
-        expiry_date = "N/A"
-        remaining = "N/A"
+    expiry = datetime.fromtimestamp(sub["expiry"], IST).strftime("%d-%b-%Y %I:%M %p")
+    remaining = await get_remaining_time(sub["expiry"])
 
-    service = await services_data.find_one({"_id": ObjectId(sub["service_id"])})
-    service_name = service["service_name"] if service else "Unknown"
+    text = f"""
+<b><blockquote>Subscription Details</blockquote>
 
-    text = f"""<b><blockquote>Subscription Details</blockquote>
+🛠 Service: {service_name}
+⏰ Expiry: {expiry}
+⏳ Remaining: {remaining}
 
-Service: {service_name}
-Expiry: {expiry_date}
-Remaining: {remaining}
+<blockquote>〽️ Powered by {POWERED_BY}</blockquote></b>
+"""
 
-<blockquote>〽️ Powered by {POWERED_BY}</blockquote></b>"""
+    buttons = []
+    if page > 1:
+        buttons.append(InlineKeyboardButton("⬅️ Prev", callback_data=f"sub_page_{page-1}"))
+    if page < total_pages:
+        buttons.append(InlineKeyboardButton("Next ➡️", callback_data=f"sub_page_{page+1}"))
 
-    await message.reply_photo(
-        photo=IMG_URL,
+    await message.edit_caption(
         caption=text,
-        parse_mode=enums.ParseMode.HTML,
+        reply_markup=InlineKeyboardMarkup([buttons]) if buttons else None,
+        parse_mode=enums.ParseMode.HTML
     )
+
+# ============================== ADMIN LIST ==============================
+
+async def get_user_list_page(client, page, users):
+    start = page * PAGE_SIZE
+    end = start + PAGE_SIZE
+    result = []
+
+    for u in users[start:end]:
+        user = await client.get_users(u["user_id"])
+        service = await services_data.find_one({"_id": ObjectId(u["service_id"])})
+
+        result.append(
+            f"""
+<b>
+👤 {user.first_name}
+🆔 <a href="tg://user?id={user.id}">{user.id}</a>
+🛠 {service['service_name']}
+</b>
+"""
+        )
+    return result
