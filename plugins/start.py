@@ -38,7 +38,7 @@ async def start(client, message):
 
     buttons = InlineKeyboardMarkup(
         [
-            [InlineKeyboardButton("🛒 Buy Service", callback_data="buy_service")],
+            [InlineKeyboardButton("🛒 Buy Service", callback_data="/buy_service")],
             [InlineKeyboardButton("📦 My Subscription", callback_data="my_sub")]
         ]
     )
